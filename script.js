@@ -61,10 +61,13 @@ class App {
     #workouts = [];
     #mapZoom = 13;
     constructor() {
+        // GET Position form Navigator/User
         this._getPosition();
+        // Submit new  Workout 
         form.addEventListener('submit', this._newWorkout.bind(this));
-
         inputType.addEventListener('change', this._toggleElevationField);
+        // Move workout 
+        containerWorkouts.addEventListener('click', this._moveWorkout.bind(this));
     }
     _getPosition() {
         if (navigator.geolocation) {
@@ -154,7 +157,7 @@ class App {
     }
     _randerWorkoutList(workout) {
         let html = `
-        <li class="workout workout--running" data-id="1234567890">
+        <li class="workout workout--running" data-id="${workout.id}">
         <h2 class="workout__title">Running on April 14</h2>
         <div class="workout__details">
           <span class="workout__icon">${workout.type === 'running' ? '🏃‍♂️' : '🚴'}</span>
@@ -195,6 +198,22 @@ class App {
             </li>`;
         }
         form.insertAdjacentHTML('afterend', html);
+    }
+    _moveWorkout(e) {
+        const workEl = e.target.closest('.workout');
+
+        if (!workEl) return;
+
+        const work = this.#workouts.find(
+            workout => workout.id === workEl.dataset.id
+        );
+
+        this.#map.setView(work.coords, this.#mapZoom, {
+            animate: true,
+            pan: {
+                duration: 1,
+            }
+        })
     }
 }
 const app = new App();
